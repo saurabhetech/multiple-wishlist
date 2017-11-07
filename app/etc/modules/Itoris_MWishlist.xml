@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config>
+	<modules>
+		<Itoris_MWishlist>
+			<active>true</active>
+			<codePool>local</codePool>
+			<depends>
+				<Mage_Wishlist/>
+			</depends>
+		</Itoris_MWishlist>
+	</modules>
+</config>

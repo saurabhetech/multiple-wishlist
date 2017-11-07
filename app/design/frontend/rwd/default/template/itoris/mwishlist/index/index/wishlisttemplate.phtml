@@ -1,0 +1,619 @@
+<?php
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2012 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+?>
+<?php
+/** @var $this Itoris_MWishlist_Block_Frontview */
+$namesmodel = Mage::getModel('itoris_mwishlist/mwishlistnames');
+$namescollection = $namesmodel->getnamecollection(null, true);
+$id = $this->getRequest()->getParam('tabId', $this->getTabId());
+$version = version_compare(Mage::getVersion(), '1.10.0.0', '>=') ? '1.9.0.0' : Mage::getVersion();
+$isEnabledPriceVisibility = $this->getDataHelper()->isEnabledProductVisibility();
+$canAddAllToShoppingCart = true;
+?>
+<div id="central">
+<div id='central_head'>
+	<?php
+	$temp = array();
+	$temp = $namesmodel->getNameById($id);
+	$wishlistName = $temp['multiwishlist_name'];
+	$wishlistId = $temp['multiwishlist_id']; ?>
+
+	<table width="100%">
+		<tr>
+			<td>
+				<?php echo $this->__('Wishlist: '); ?>
+				<?php if ($temp['multiwishlist_editable']): ?>
+					<input type="text" id="mwishlist_new_name" value="<?php echo htmlentities($wishlistName) ?>" />
+					<button type="button" class="button" onclick="mwishlistRename(<?php echo $wishlistId ?>);">
+						<span><span><?php echo $this->__('Rename') ?></span></span>
+					</button>
+				<?php else: ?>
+					<span><?php echo htmlentities($wishlistName) ?></span>
+				<?php endif; ?>
+			</td>
+			<?php if ($wishlistId != 1): ?>
+				<td>
+					<?php if ($temp['multiwishlist_editable'] && !$temp['multiwishlist_is_main']): ?>
+						<div id='delbutton'>
+							<button type="button" title="<?php echo $this->__('Delete') ?>"
+									onclick="deleteWishlist(<?php echo $wishlistId ?>)" class="button delete">
+								<span><span><?php echo $this->__('Delete wishlist') ?></span></span></button>
+						</div>
+					<?php endif; ?>
+				</td>
+
+			<?php endif ?>
+		</tr>
+		<tr>
+			<?php 
+			if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+				$data = array();
+				$data['wishlistId'] =$wishlistId;
+				$data['customerId'] =Mage::getSingleton('customer/session')->getCustomer()->getId();
+
+				$wishlistModel = Mage::getModel('itoris_mwishlist/mwishlistnames');
+				$display_price_check = $wishlistModel->getPricingDisplay($data);
+			} else {
+				$display_price_check = 0;
+			}
+			?>
+			<td class="pricing_checkbox">
+				<input type="checkbox" name="display_price" id="display_price_<?php echo $wishlistId;?>" onclick="setPricingDisplay(<?php echo $wishlistId ?>, <?php echo $id;?>)" <?php if ($display_price_check) echo "checked='checked'"; ?> class="display_price" />
+				<span class="pricing_label span"><?php echo $this->__('Display No Prices') ?></span>
+			</td>
+		</tr>
+	</table>
+</div>
+<?php if ($this->getHasWishlistItems()): ?>
+	<form id="wishlist-view-form" action="<?php echo $this->getUrl('*/*/update') ?>" method="post">
+	<input type="hidden" name="mwishlist_id" value="<?php echo $wishlistId ?>" />
+	<fieldset>
+	<input type="hidden" name="tabId" value="<?php echo $id?>">
+	<?php echo $this->getBlockHtml('formkey')?>
+	<table class="data-table" id="wishlist-table">
+		<?php if ($temp['multiwishlist_editable']): ?>
+			<col width="1"/>
+		<?php endif; ?>
+		<col width="1"/>
+		<col/>
+		<?php if (!$display_price_check):?>
+			<col/>
+		<?php endif;?>
+		<col width="25%"/>
+		<thead>
+		<tr>
+			<?php if ($temp['multiwishlist_editable']): ?>
+				<th class="a-center"><input type="checkbox" name="all" onclick="checkAll(this.form,this.name);"></th>
+			<?php endif; ?>
+			<th><?php echo $this->__('Product') ?></th>
+			<th><?php echo $this->__('Comment') ?></th>
+			<?php if (!$display_price_check):?>
+				<th style="width:20%;"><?php echo $this->__('Price') ?></th>
+			<?php endif;?>
+			<th class="a-center"><span class="nobr"></span></th>
+		</tr>
+		</thead>
+		<tbody>
+		<?php foreach ($this->getWishlistItems() as $item): ?>
+			<?php
+			$product = $item->getProduct();
+			$priceVisibilityConfig = $isEnabledPriceVisibility ? $this->getProductPriceVisibilityConfig($product) : null;
+			$urlParamName = Mage_Core_Controller_Front_Action::PARAM_NAME_URL_ENCODED;
+			$continueUrl = Mage::helper('core')->urlEncode(Mage::getUrl('*/*/*', array(
+				'_current' => true,
+				'_use_rewrite' => true,
+			)));
+			$store = Mage::app()->getStore($item->getStoreId());
+			$addToCartUrl = $this->getUrl('wishlist/index/cart', array(
+				'item' => $item->getWishlistItemId(),
+				'qty'  => '{{qty}}',
+			));
+			//$isVisibleProduct = $product->isVisibleInSiteVisibility();
+			$wishlistItemId = $item->getId();
+			?>
+			<tr>
+				<?php if ($temp['multiwishlist_editable']): ?>
+					<td><input type="checkbox" class="single" name="<?php echo $item->getWishlistItemId() ?>"></td>
+				<?php endif; ?>
+				<td>
+					<?php if ((int)$version[2] >= 5): ?>
+
+						<a class="product-image"
+						   href="<?php echo $product->getProductUrl() ?>"
+						   title="<?php echo $this->htmlEscape($product->getName()) ?>"><img
+								src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(113, 113); ?>"
+								width="113" height="113" alt="<?php echo $this->htmlEscape($product->getName()) ?>"/></a>
+						<h2 class="product-name"><a
+								href="<?php echo Mage::getModel('catalog/product')->load($product->getId())->getProductUrl() ?>"><?php echo $this->htmlEscape($product->getName()) ?></a>
+						</h2>
+					<?php else: ?>
+						<a class="product-image"
+						   href="<?php echo Mage::getSingleton('catalog/product_url')->getUrl($product)?>"
+						   title="<?php echo $this->htmlEscape($product->getName()) ?>"><img
+								src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(113, 113); ?>"
+								width="113" height="113" alt="<?php echo $this->htmlEscape($product->getName()) ?>"/></a>
+						<h2 class="product-name"><a
+								href="<?php echo  Mage::getSingleton('catalog/product_url')->getUrl($product) ?>"><?php echo $this->htmlEscape($product->getName()) ?></a>
+						</h2>
+					<?php   endif; ?>
+					<?php if (!$priceVisibilityConfig || $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_DEFAULT
+						|| $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_SHOW_PRICE_DISALLOW_ADD_TO_CART): ?>
+						<?php
+						echo $this->getCleanProductPriceHtml();
+						$finalPrice = $product->getFinalPrice(1);
+						$pointsPrice = $this->getPointsPrice($product, $finalPrice);
+						?>
+						<p class="price-box">
+					<span class="regular-price" id="product-price-<?php echo $product->getId()?><?php echo $product->getIdSuffix() ?>">
+						<?php if ($pointsPrice && $pointsPrice['override']): ?>
+							<span class="price"><?php echo $this->getProductRewardsHelper()->__('%d RP', $pointsPrice['points']) ?></span>
+						<?php else: ?>
+							<span class="price"><?php echo Mage::helper('core')->currency($finalPrice, true, false); ?> <?php if ($pointsPrice && $pointsPrice['points']): echo $this->getProductRewardsHelper()->__('or %d RP', $pointsPrice['points']); endif; ?></span>
+						<?php endif; ?>
+					</span>
+						</p>
+					<?php elseif ($priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_OUT_OF_STOCK): ?>
+						<p class="availability out-of-stock"><span><?php echo $this->__('Out of Stock') ?></span></p>
+					<?php elseif ($priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_CUSTOM_MESSAGE): ?>
+						<p><?php echo $priceVisibilityConfig['message'] ?></p>
+					<?php endif; ?>
+					<?php echo $this->getDetailsHtml($item) ?>
+				</td>
+				<td>
+					<textarea name="description[<?php echo $item->getWishlistItemId() ?>]" rows="3" cols="5"
+							  onfocus="focusComment(this)" onblur="focusComment(this)"
+							  title="<?php echo $this->__('Comment') ?>"><?php echo $item->getDescription()
+							? $item->getDescription() : $this->__('Please, enter your comments...') ?></textarea>
+				</td>
+				<?php if (!$display_price_check):?>
+					<td><p><?php echo $this->__('Price') ?></p></td>
+				<?php endif;?>
+				<td>
+					<?php if (!$priceVisibilityConfig || $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_DEFAULT): ?>
+						<p><strong><?php echo $this->__('&nbsp;Add to Shopping Cart:') ?></strong></p>
+						<?php if ((int)$version[2] >= 5): ?>
+							<input type="text" class="input-text qty" name="qty[<?php echo $item->getId() ?>]" value="<?php echo floatval($item->getQty()); ?>"/>
+						<?php endif ?>
+						<?php if ($product->isSaleable()): ?>
+							<button type="button" title="<?php echo $this->__('Add to Cart') ?>" onclick="mwishlistAddToCart('<?php echo $addToCartUrl ?>', <?php echo $item->getId() ?>);" class="button btn-cart">
+								<span><span><?php echo $this->__('Add to Cart') ?></span></span>
+							</button>
+						<?php endif ?>
+						<?php if ((int)$version[2] >= 5): ?>
+							<?php echo $this->getDetailsLinkHtml($item); ?>
+						<?php endif ?>
+					<?php elseif ($priceVisibilityConfig && $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_SHOW_PRICE_DISALLOW_ADD_TO_CART): ?>
+						<p><?php echo $priceVisibilityConfig['message'] ?></p>
+					<?php else:
+						$canAddAllToShoppingCart = false;
+					endif; ?>
+					<?php if ($temp['multiwishlist_editable']): ?>
+						<?php if (count($namescollection) > 1): ?>
+							<?php if ((int)$version[2] >= 5): ?>
+								<strong><?php echo $this->__('&nbsp;Copy/Move to Wishlist:') ?></strong>
+							<?php endif ?>
+							<?php if ((int)$version[2] == 4): ?>
+								<div><strong><?php echo $this->__('&nbsp;Move to Wishlist:') ?></strong></div>
+							<?php endif ?>
+							<select class="input.select" id="select[<?php echo $item->getId() ?>]" style="width:100%;margin-bottom: 5px;"
+									style="margin-bottom:10;" value=""/>
+							<?php foreach ($namescollection as $row): ?>
+								<?php if ($wishlistId == $row['multiwishlist_id']) continue; ?>
+								<option value="<?php echo $row['multiwishlist_id']?>"><?php echo $this->__($row['multiwishlist_name'])?></option>
+							<?php endforeach ?>
+							</select>
+							<table class="button-set-table">
+								<tr class="tr-del">
+									<td class="td-del">
+										<button type="button" title="<?php echo $this->__('Move') ?>"
+												onclick="moveBetweenLists(<?php echo $item->getId()?>,$('select[<?php echo $item->getId() ?>]').value)"
+												class="button btn-move"><span><span><?php echo $this->__('Move') ?></span></span>
+										</button>
+									</td>
+									<?php if ((int)$version[2] >= 5): ?>
+										<td class="td-del">
+											<button type="button" title="<?php echo $this->__('Copy') ?>"
+													onclick="copyToWlist(<?php echo $item->getId()?>,$('select[<?php echo $item->getId() ?>]').value)"
+													class="button btn-copy"><span><span><?php echo $this->__('Copy') ?></span></span>
+											</button>
+										</td>
+									<?php endif ?>
+								</tr>
+							</table>
+						<?php endif; ?>
+						<table class="button-set-table">
+							<tbody>
+							<tr class="tr-del">
+								<td class="td-del">
+									<button class="button btn-copy" onclick="setLocation('<?php echo $this->getUrl("wishlist/index/configure/id/$wishlistItemId") ?>'); return false;">
+										<span><span><?php echo $this->__('Edit') ?></span></span>
+									</button>
+								</td>
+								<td class="td-del">
+									<button type="button" class="button delete" onclick="removeItem(<?php echo $item->getId()?>)">
+										<span><span><?php echo $this->__('Remove') ?></span></span>
+									</button>
+								</td>
+							</tr>
+							</tbody>
+						</table>
+					<?php endif; ?>
+				</td>
+			</tr>
+		<?php endforeach ?>
+		</tbody>
+	</table>
+	<script type="text/javascript">decorateTable('wishlist-table')</script>
+	<div class="buttons-set buttons-set2">
+		<table width="100%">
+			<tbody>
+			<tr>
+				<?php if ($temp['multiwishlist_editable']): ?>
+					<td width="45%">
+						<div class="div-mwishbottom">
+							<button type="button" title="<?php echo $this->__('Delete') ?>"
+									onclick="mwishlistAddToCartCheckedItems(<?php echo $wishlistId ?>)"
+									class="button btn-copy"><span><?php echo $this->__('Add Selected to Cart') ?></span>
+							</button>
+							<button type="button" title="<?php echo $this->__('Delete') ?>"
+									onclick="mwishlistDeleteCheckedItems(<?php echo $wishlistId ?>)"
+									class="button delete"><span><?php echo $this->__('Delete Selected') ?></span>
+							</button><br/>
+                            <?php if (count($namescollection) > 1) : ?>
+                                <select class="input.select" id="select_all" style="width:80px;" value=""/>
+                                <?php foreach ($namescollection as $row): ?>
+                                    <?php if ($wishlistId == $row['multiwishlist_id']) continue; ?>
+                                    <option value="<?php echo $row['multiwishlist_id']?>"><?php echo $this->__($row['multiwishlist_name'])?></option>
+                                <?php endforeach ?>
+                                </select>
+                                <button type="button" title="<?php echo $this->__('Move') ?>"
+                                        onclick="moveCheckedItemsBetweenLists($('select_all').value)"
+                                        class="button btn-move"><span><span><?php echo $this->__('Move') ?></span></span>
+                                </button>
+                                <?php if ((int)$version[2] >= 5): ?>
+                                    <button type="button" title="<?php echo $this->__('Copy') ?>"
+                                            onclick="copyCheckedToWlist($('select_all').value)" class="button btn-copy">
+                                        <span><span><?php echo $this->__('Copy') ?></span></span></button>
+                                <?php endif ?>
+                            <?php endif ?>
+						</div>
+
+
+					</td>
+				<?php endif; ?>
+				<td width="47%" style="vertical-align: top;">
+					<div class="div-mwishbottomright">
+						<button type="button" onclick="setLocation('<?php echo $this->getUrl('wishlist/index/share', array('id' => $wishlistId)) ?>')"
+								title="<?php echo $this->__('Share Wishlist') ?>" class="button btn-copy">
+							<span><span><?php echo $this->__('Share Wishlist') ?></span></span></button>
+						<?php //if($this->isSaleable()):?>
+						<?php if ($canAddAllToShoppingCart): ?>
+							<button type="button" title="<?php echo $this->__('Add All to Cart') ?>"
+									onclick="openme()" class="button btn-copy">
+								<span><span><?php echo $this->__('Add All to Cart') ?></span></span></button>
+						<?php endif; ?>
+						<button type="submit" title="<?php echo $this->__('Update Wishlist') ?>"
+								onclick="this.name='do'" class="button btn-update">
+							<span><span><?php echo $this->__('Update Wishlist') ?></span></span></button>
+						<button type="button" onclick="setLocation('<?php echo $this->getUrl('wishlist/index/resetquantity', array('id' => $wishlistId)) ?>')"
+								title="<?php echo $this->__('Reset All Quantity') ?>" class="button btn-update">
+							<span><span><?php echo $this->__('Reset All Quantity') ?></span></span></button>
+					</div>
+				</td>
+			</tr>
+			</tbody>
+		</table>
+	</div>
+	</fieldset>
+	</form>
+<?php else: ?>
+	<p><?php echo $this->__('You have no items in your wishlist.') ?></p>
+<?php endif ?>
+</div>
+<script type="text/javascript">
+
+jQuery(document).ready(function() {
+
+});
+function openme() {
+	jQuery('#itoris-wishlist-addtocart-popup').css('display', 'block');
+}
+if ($$('.iwishtabs .titles .title.current')[0]) {
+	$$('.iwishtabs .titles .title.current')[0].removeClassName('current');
+}
+$('tab_title_<?php echo $id;?>').addClassName('current');
+function checkAll(form, checkname) {
+	if (form.elements[checkname].checked == true) {
+		for (var i = 1, n = form.elements.length; i < n; i++) {
+			if (form.elements[i].type == 'checkbox') {
+				form.elements[i].checked = true;
+			}
+		}
+	} else {
+		for (i = 1,n = form.elements.length; i < n; i++) {
+			if (form.elements[i].type == 'checkbox') {
+				form.elements[i].checked = true;
+				form.elements[i].checked = form.elements[i].defaultChecked;
+			}
+		}
+	}
+}
+function deleteWishlist(wishlistId) {
+	if (confirmRemoveWishlist()) {
+		new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax')?>', { method: 'post',
+			parameters: {removeWishlist: wishlistId},
+			onSuccess: function(transport) {
+				itorisWishlist.hideMobileContent(true);
+				Element.hide('loading-mask');
+				$('tabsandcontent').update(transport.responseText);
+
+				initializeTabsSlider();
+				itorisWishlist.showMobileContent(true);
+			},
+			onLoading: Element.show('loading-mask')
+		});
+	}
+}
+function removeItem(itemId) {
+	if (confirmRemoveWishlistItem()) {
+		new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax')?>', { method: 'post',
+			parameters: {remove: itemId, tabId: $$('.title.current')[0].id.substring(10)},
+			onSuccess: function(transport) {
+				itorisWishlist.hideMobileContent(true);
+				Element.hide('loading-mask');
+				$('central').update(transport.responseText);
+				mwishlistUpdateLink();
+				retruncateOptionsTimeout();
+				itorisWishlist.showMobileContent(true);
+			},
+			onLoading: Element.show('loading-mask')
+		});
+	}
+}
+function copyToWlist(itemId, listId) {
+	itorisWishlist.hideMobileContent();
+	new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax')?>', { method: 'post',
+		parameters: {itemCopy: itemId, list: listId, tabId: listId},
+		onSuccess: function(transport) {
+			Element.hide('loading-mask');
+			$('central').update(transport.responseText);
+			mwishlistUpdateLink();
+			retruncateOptionsTimeout();
+			setTimeout(function(){itorisWishlist.showMobileContent();}, 100);
+		},
+		onLoading: Element.show('loading-mask')
+	});
+}
+function copyCheckedToWlist(listId) {
+	var array = new Array();
+	var i = 0;
+	$$('.single').each(function(elem) {
+		if (elem.checked) {
+			array[i] = elem.name;
+			i++;
+		}
+	});
+	if (array[0]) {
+		new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax')?>', { method: 'post',
+			parameters: {'itemsCopy[]': array,
+				list: listId, tabId: listId},
+			onSuccess: function(transport) {
+				itorisWishlist.hideMobileContent(true);
+				Element.hide('loading-mask');
+				$('central').update(transport.responseText);
+				mwishlistUpdateLink();
+				retruncateOptionsTimeout();
+				itorisWishlist.showMobileContent(true);
+			},
+			onLoading: Element.show('loading-mask')
+		});
+	} else {
+		alert('Items not selected')
+	}
+}
+function moveBetweenLists(itemId, listId) {
+	itorisWishlist.hideMobileContent();
+	new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax')?>', { method: 'post',
+		parameters: {itemMove: itemId, list: listId, tabId: listId},
+		onSuccess: function(transport) {
+			Element.hide('loading-mask');
+			$('central').update(transport.responseText);
+			mwishlistUpdateLink();
+			retruncateOptionsTimeout();
+			setTimeout(function(){itorisWishlist.showMobileContent();}, 100);
+		},
+		onLoading: Element.show('loading-mask')
+	});
+}
+function moveCheckedItemsBetweenLists(listId) {
+	var array = new Array();
+	var i = 0;
+	$$('.single').each(function(elem) {
+		if (elem.checked) {
+			array[i] = elem.name;
+			i++;
+		}
+	});
+	if (array[0]) {
+		new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax')?>', { method: 'post',
+			parameters: {'itemsMove[]': array,
+				list: listId, tabId: listId},
+			onSuccess: function(transport) {
+				itorisWishlist.hideMobileContent(true);
+				Element.hide('loading-mask');
+				$('central').update(transport.responseText);
+				mwishlistUpdateLink();
+				retruncateOptionsTimeout();
+				itorisWishlist.showMobileContent(true);
+			},
+			onLoading: Element.show('loading-mask')
+		});
+	} else {
+		alert('<?php echo addslashes($this->__('Items not selected')) ?>');
+	}
+}
+function setPricingDisplay(wishlistId, tabId) {
+	var id = '#display_price_'+wishlistId;
+	if(jQuery(id).prop("checked") == true){
+        var display_price = 1;
+    }
+    else if(jQuery(id).prop("checked") == false){
+        var display_price = 0;
+    }
+	new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/setPricingDisplay')?>', { method: 'post',
+		parameters: {wishlistId: wishlistId, display_price: display_price, tabId: tabId},
+		onSuccess: function(transport) {
+			Element.hide('loading-mask');
+			console.log(transport.responseText);
+			$('fullcontent').update(transport.responseText);
+		},
+		onLoading: Element.show('loading-mask')
+	});
+
+}
+function mwishlistAddToCartCheckedItems(wishlistId) {
+	var items = mwishlistGetSelectedItems();
+	if (items.length) {
+		var params = {
+			'items[]': items,
+			wishlist_id: wishlistId
+		};
+		$$('#wishlist-view-form .qty').each(
+			function (input) {
+				params[input.name] = input.value;
+			}
+		);
+		var url = '<?php echo $this->getUrl('*/*/addToCartSelectedItems') ?>';
+		url += ((url.indexOf('?') >= 0) ? '&' : '?') + 'wishlist_id=' + wishlistId;
+		var separator = '&';
+		$$('#wishlist-view-form .qty').each(
+			function (input) {
+				url += separator + input.name + '=' + encodeURIComponent(input.value);
+			}
+		);
+		for (var i = 0; i < items.length; i++) {
+			url += separator + 'items[' + i + ']=' + items[i];
+		}
+		setLocation(url);
+	} else {
+		alert('<?php echo addslashes($this->__('Items not selected')) ?>');
+	}
+}
+function mwishlistDeleteCheckedItems(listId) {
+	var items = mwishlistGetSelectedItems();
+	if (items.length) {
+		if (confirm('<?php echo addslashes($this->__('Do you really want to delete selected products?')) ?>')) {
+			new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax') ?>', {
+				method: 'post',
+				parameters: {
+					'itemsDelete[]': items,
+					list: listId,
+					tabId: listId
+				},
+				onSuccess: function(transport) {
+					itorisWishlist.hideMobileContent(true);
+					Element.hide('loading-mask');
+					$('central').update(transport.responseText);
+					mwishlistUpdateLink();
+					retruncateOptionsTimeout();
+					itorisWishlist.showMobileContent(true);
+				},
+				onLoading: Element.show('loading-mask')
+			});
+		}
+	} else {
+		alert('<?php echo addslashes($this->__('Items not selected')) ?>');
+	}
+}
+function mwishlistGetSelectedItems() {
+	var items = [];
+	$$('.single').each(function(elem) {
+		if (elem.checked) {
+			items.push(elem.name);
+		}
+	});
+	return items;
+}
+function confirmRemoveWishlistItem() {
+	return confirm('<?php echo $this->__('Are you sure you want to remove this product from your wishlist?') ?>');
+}
+function confirmRemoveWishlist() {
+	return confirm('<?php echo $this->__('Do you really want to delete this Wishlist along with all products in it?') ?>');
+}
+function focusComment(obj) {
+	if (obj.value == 'Please, enter your comments...') {
+		obj.value = '';
+	} else if (obj.value == '') {
+		obj.value = 'Please, enter your comments...';
+	}
+}
+function addAllWItemsToCart(wishlistId, formId) {
+	var url = '<?php echo $this->getUrl('*/*/allcart') ?>';
+	url += (url.indexOf('?') >= 0) ? '&wishlist_id=' + wishlistId : '?wishlist_id=' + wishlistId;
+	var separator = '&';
+	$$('#' + (formId || 'wishlist-view-form') + ' .qty').each(
+		function (input, index) {
+			url += separator + input.name + '=' + encodeURIComponent(input.value);
+		}
+	);
+	setLocation(url);
+}
+
+function mwishlistAddToCart(url, itemId) {
+	var qtyElm = document.getElementsByName('qty[' + itemId + ']')[0];
+	if (qtyElm) {
+		url = url.sub('{{qty}}', parseNumber(qtyElm.value));
+	}
+	setLocation(url);
+}
+
+function mwishlistRename(wishlistId) {
+	var newName = $('mwishlist_new_name').value.strip();
+	if (newName.length) {
+		if (newName != currentWishlistName) {
+			new Ajax.Request('<?php echo $this->getUrl('wishlist/index/renameWishlist') ?>', {
+				parameters: {name: newName, id: wishlistId},
+				onComplete: function(res) {
+					Element.hide('loading-mask');
+					var resObj = res.responseText.evalJSON();
+					if (resObj.error) {
+						alert(resObj.error);
+					} else if (resObj.ok) {
+						currentWishlistName = newName;
+						var titleElm = $$('.iwishtabs .titles .title.current .center')[0];
+						if (titleElm) {
+							titleElm.update(currentWishlistName);
+						}
+					}
+				},
+				onLoading: Element.show('loading-mask')
+			});
+		}
+	} else {
+		alert('<?php echo addslashes($this->__('Please enter a new name')) ?>');
+	}
+}
+currentWishlistName = '<?php echo addslashes($wishlistName) ?>';
+</script>

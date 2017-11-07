@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+
+<config>
+    <menu>
+        <system>
+            <children>
+                <itoris_extensions>
+                    <title>Itoris</title>
+                    <sort_order>5</sort_order>
+                    <children>
+                        <mwishlist translate="title">
+                            <title>Multiple wishlists</title>
+                            <action>adminhtml/itorismwishlist_index/</action>
+                            <sort_order>5</sort_order>
+                        </mwishlist>
+                    </children>
+                </itoris_extensions>
+            </children>
+        </system>
+    </menu>
+	<acl>
+		<resources>
+			<admin>
+				<children>
+					<system>
+						<children>
+							<itoris_extensions>
+                                <title>Itoris</title>
+                                <sort_order>5</sort_order>
+                    			<children>
+                        			<mwishlist translate="title">
+                            			<title>Multiple wishlists</title>
+                            			<action>adminhtml/itorismwishlist_index/</action>
+                            			<sort_order>5</sort_order>
+                        			</mwishlist>
+                    			</children>
+                			</itoris_extensions>
+						</children>
+					</system>
+				</children>
+			</admin>
+		</resources>
+	</acl>
+</config>
+
+
+
+		

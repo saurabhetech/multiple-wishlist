@@ -1,0 +1,84 @@
+<?php 
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2012 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+?>
+<?php echo $this->getChildHtml('form'); ?>
+<?php echo $this->getGridParentHtml() ?>
+<?php if($this->canDisplayContainer()): ?>
+<?php if (version_compare(Mage::getVersion(),'1.4.0', '>=')) : ?>
+	<script type="text/javascript">
+		//<!--
+		wishlistControl = {
+			reload: function (urlParams) {
+				if (!urlParams) {
+					urlParams = '';
+				}
+				var url = <?php echo $this->getJsObjectName() ?>.url + '?ajax=true' + urlParams;
+				new Ajax.Updater(
+					<?php echo $this->getJsObjectName() ?>.containerId,
+					url,
+					{
+						parameters: {form_key: FORM_KEY},
+						onComplete: <?php echo $this->getJsObjectName() ?>.initGrid.bind(<?php echo $this->getJsObjectName() ?>),
+					evalScripts:true
+			}
+		);
+		},
+
+		configureItem: function (itemId) {
+			if (productConfigure) {
+				productConfigure.setOnLoadIFrameCallback('wishlist', this.cbOnLoadIframe.bind(this));
+				productConfigure.showItemConfiguration('wishlist', itemId);
+			}
+			return false;
+		},
+
+		cbOnLoadIframe: function (response) {
+			if (!response.ok) {
+				return;
+			}
+			this.reload();
+		},
+
+		removeItem: function (itemId) {
+			if(!confirm('<?php echo Mage::helper('customer')->__('Are you sure that you want to remove this item?') ?>')) {
+				return false;
+			}
+			this.reload('&delete=' + itemId);
+			return false;
+		}
+		}
+		if (productConfigure) {
+			productConfigure.addListType(
+				'wishlist',
+				{
+					urlFetch: '<?php echo $this->getUrl('*/customer_wishlist_product_composite_wishlist/configure') ?>',
+					urlConfirm: '<?php echo $this->getUrl('*/customer_wishlist_product_composite_wishlist/update') ?>'
+				}
+			);
+		}
+		//-->
+	</script>
+	<?php endif; ?>
+<?php endif ?>

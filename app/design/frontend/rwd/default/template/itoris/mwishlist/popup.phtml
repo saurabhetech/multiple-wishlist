@@ -1,0 +1,84 @@
+<?php
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2013 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+
+/** @var $this Itoris_MWishlist_Block_Popup */
+?>
+
+<?php
+$wishlists = $this->getWishlists();
+$mainWishlist = null;
+?>
+<div id="itoris-wishlist-popup-box" class="itoris-wishlist-popup-box-remove" style="display: none;">
+	<div id="itoris-wishlist-popup-mask"></div>
+	<div id="itoris-wishlist-popup" class="window">
+		<div id="itoris-wishlist-popup-loading" style="display: none;"></div>
+		<h4 style="margin-left: 20px;margin-top: 10px"><?php echo $this->__('Please select a wishlist you wish to add selected product(s) to:')?></h4>
+
+		<div id="itoris-wishlist-radiostack">
+			<?php foreach ($wishlists as $wishlist): ?>
+				<div>
+					<input type="radio" class="itoris-wishlist-radio" name="itoris-wishlist-radio" value="<?php echo $wishlist['multiwishlist_id'] ?>"
+						   id="itoris-wishlist-radio-<?php echo $wishlist['multiwishlist_id'] ?>"
+						<?php if ($wishlist['multiwishlist_is_main']): $mainWishlist = $wishlist['multiwishlist_id']; ?> checked="checked" <?php endif; ?>
+						   alt="<?php echo htmlentities($this->__($wishlist['multiwishlist_name'])) ?>"
+						/>
+					<label for="itoris-wishlist-radio-<?php echo $wishlist['multiwishlist_id'] ?>"><?php echo $this->__($wishlist['multiwishlist_name']) ?></label>
+				</div>
+			<?php endforeach ?>
+			<div>
+				<input type="radio" class="itoris-wishlist-radio" name="itoris-wishlist-radio" value="new" />
+				<?php echo $this->__('or create a new wishlist:') ?>
+				<input type="text" id="itoris-wishlist-new-name" width="50%" />
+			</div>
+		</div>
+		<div id="itoris-wishlist-popup-buttons">
+			<button type="button" title="<?php echo $this->__('Select') ?>" class="itoris-wishlist-button-select">
+				<span><span><?php echo $this->__('Select') ?></span></span>
+			</button>
+			<button type="button" title="<?php echo $this->__('Cancel') ?>" class="itoris-wishlist-button-cancel">
+				<span><span><?php echo $this->__('Cancel') ?></span></span>
+			</button>
+		</div>
+	</div>
+	<script type="text/javascript">
+		itorisWishlistPopup = new Itoris.WishlistPopup(<?php echo $this->getConfigJson() ?>);
+		Event.observe(document, 'dom:loaded', function(){
+			var body = $$('body')[0];
+			if (body) {
+				body.appendChild($('itoris-wishlist-popup-box'));
+			}
+			itorisWishlistPopup.mainWishlist = '<?php echo $mainWishlist ?>';
+			var protectedItems = [<?php echo implode(',', Mage::getModel('itoris_mwishlist/wishlist')->getProtectedItems()) ?>];
+			$$('#wishlist-sidebar a.btn-remove').each(function(a){
+				for(var i=0; i<protectedItems.length; i++) {
+					if (a.href.indexOf('/wishlist/index/remove/item/'+protectedItems[i]+'/') > -1 ) {
+						a.setStyle({visibility: 'hidden'});
+						break;
+					}
+				}
+			});
+		});
+	</script>
+</div>

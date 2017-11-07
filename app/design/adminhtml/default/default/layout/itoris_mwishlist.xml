@@ -1,0 +1,31 @@
+<layout version="0.1.0">
+	<adminhtml_itorismwishlist_index_index>
+		<reference name="head">
+			<action method="addJs"><file>itoris/mwishlist/admin/settings.js</file></action>
+		</reference>
+		<reference name="left">
+			<block type="itoris_mwishlist/admin_index_index_switcher" name="leftswitcher"
+				   template="store/switcher.phtml">
+			</block>
+		</reference>
+		<reference name="content">
+			<block type="itoris_mwishlist/admin_index_index_content" name="centralcontent">
+			</block>
+			<block type="itoris_mwishlist/admin_index_index_content_form_checkbox" name="centralcheckbox"
+				   template="itoris/mwishlist/index/index/checkbox.phtml">
+			</block>
+		</reference>
+	</adminhtml_itorismwishlist_index_index>
+	<adminhtml_customer_edit>
+        <reference name="head">
+            <action method="addJs"><file>itoris/mwishlist/admin/wishlist.js</file></action>
+            <action method="addItem"><type>js_css</type><name>itoris/mwishlist/admin/css/wishlist.css</name></action>
+		</reference>
+	</adminhtml_customer_edit>
+
+    <itoris_mwishlist_product_grid>
+        <block type="core/text_list" name="root" output="toHtml">
+            <block type="itoris_mwishlist/admin_wishlist_product_grid" name="grid" />
+        </block>
+    </itoris_mwishlist_product_grid>
+</layout>

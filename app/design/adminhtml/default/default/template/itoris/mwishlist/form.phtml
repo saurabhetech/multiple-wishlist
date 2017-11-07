@@ -1,0 +1,81 @@
+<?php 
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2012 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+?>
+<?php
+/** @var $block Itoris_MWishlist_Block_Admin_Wishlist_Form */
+$block = $this;
+/** @var $helper Itoris_MWishlist_Helper_Data */
+$helper = Mage::helper('itoris_mwishlist');
+?>
+<div class="entry-edit">
+	<?php echo $block->getFormHtml(); ?>
+</div>
+<div id="mwishlist_html_templates" style="display: none;">
+	<div class="rename-template">
+		<input type="text" /><button type="button" class="button"><span><span><?php echo $this->__('Rename') ?></span></span></button>
+	</div>
+</div>
+<div id="itoris_mwishlist_products_grid_popup" style="display: none;">
+    <div class="product-grid-popup-content"></div>
+    <div class="product-grid-popup-buttons">
+        <button class="button" type="button" onclick="mwishlists.hideProductsGridPopup();"><span><span><?php echo $this->__('Cancel') ?></span></span></button>
+    </div>
+</div>
+<div id="itoris_mwishlist_popup_loading_mask" style="display:none;"></div>
+<?php
+	$translates = array(
+		'wishlistName'          => $helper->__('Wishlist Name'),
+		'manageableCustomer'    => $helper->__('Manageable for Customer'),
+		'addWishlist'           => $helper->__('Add Wishlist'),
+		'delete'                => $helper->__('delete'),
+		'deleteText'            => $helper->__('delete'),
+		'edit'                  => $helper->__('edit'),
+		'addProduct'            => $helper->__('add product'),
+		'remove'                => $helper->__('remove'),
+		'confirmRemoveProduct'  => $helper->__('Are you really want to remove this product from the wishlist?'),
+		'confirmRemoveWishlist' => $helper->__('Do you really want to delete this Wishlist?'),
+		'minimize'              => $helper->__('minimize'),
+		'enterNewName'          => $helper->__('Please enter a new name'),
+	);
+	$adminHelper = Mage::helper('adminhtml');
+	$urls = array(
+		'add'            => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/add'),
+		'getWishlists'   => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/getWishlists'),
+		'addProduct'     => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/addProduct'),
+		'deleteItem'     => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/deleteItem'),
+		'getProducts'    => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/getProducts'),
+		'deleteWishlist' => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/deleteWishlist'),
+		'renameWishlist' => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/renameWishlist'),
+        'productGrid'    => $adminHelper->getUrl('adminhtml/itorismwishlist_wishlist/productGrid'),
+	);
+?>
+<script type="text/javascript">
+	if (!$('add-new-wishlist')) {
+		mwishlists = new Itoris.MWishlists('itoris_mw', <?php echo Zend_Json::encode($urls) ?>, <?php echo Mage::registry('current_customer')->getId() ?>, <?php echo Zend_Json::encode($translates) ?>, '<?php echo Mage::helper('adminhtml')->getUrl('adminhtml/itorismwishlist_wishlist/import') ?>', '<?php echo Mage::getSingleton('core/session')->getFormKey() ?>');
+	} else {
+		var removedBlock = $$('#wishlistGrid .entry-edit');
+		removedBlock[0].remove();
+	}
+</script>

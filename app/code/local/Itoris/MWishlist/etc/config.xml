@@ -1,0 +1,221 @@
+<config>
+	<modules>
+		<Itoris_MWishlist>
+			<version>1.4.5</version>
+		</Itoris_MWishlist>
+	</modules>
+
+    <global>
+
+        <blocks>
+			<itoris_mwishlist><class>Itoris_MWishlist_Block</class></itoris_mwishlist>
+			<adminhtml>
+				<rewrite>
+					<customer_edit_tab_wishlist>Itoris_MWishlist_Block_Admin_Wishlist_View</customer_edit_tab_wishlist>
+				</rewrite>
+			</adminhtml>
+			<wishlist>
+				<rewrite>
+					<share_wishlist>Itoris_MWishlist_Block_Share_Wishlist</share_wishlist>
+				</rewrite>
+			</wishlist>
+		</blocks>
+		<models>
+			<itoris_mwishlist>
+				<class>Itoris_MWishlist_Model</class>
+				<resourceModel>mwishlist_mysql4</resourceModel>
+			</itoris_mwishlist>
+			<mwishlist_mysql4>
+				<class>Itoris_MWishlist_Model_Mysql4</class>
+                <entities>
+                    <item>
+                        <table>wishlist_item</table>
+                    </item>
+                </entities>
+            </mwishlist_mysql4>
+		</models>
+
+		<resources>
+			 <itoris_mwishlist_setup>
+                <setup>
+                    <module>Itoris_MWishlist</module>
+                    <class>Itoris_MWishlist_Model_Mysql4_Setup</class>
+                </setup>
+
+				 <connection>
+                    <use>core_setup</use>
+                </connection>
+            </itoris_mwishlist_setup>
+
+        <itoris_mwishlist_settings_write>
+            <connection>
+                <use>core_write</use>
+            </connection>
+        </itoris_mwishlist_settings_write>
+        <itoris_mwishlist_settings_read>
+            <connection>
+                <use>core_read</use>
+            </connection>
+        </itoris_mwishlist_settings_read>
+		</resources>
+
+		<helpers>
+            <itoris_mwishlist>
+                <class>Itoris_MWishlist_Helper</class>
+            </itoris_mwishlist>
+			<wishlist>
+				<rewrite>
+					<data>Itoris_MWishlist_Helper_Rewrite</data>
+				</rewrite>
+			</wishlist>
+        </helpers>
+    </global>
+
+	<adminhtml>
+		<layout>
+            <updates>
+                <itoris_mwishlist>
+                    <file>itoris_mwishlist.xml</file>
+                </itoris_mwishlist>
+            </updates>
+		</layout>
+		<menu>
+			<system>
+				<children>
+					<itoris_extensions>
+						<children>
+							<mwishlist translate="title">
+								<title>Multiple Wishlists</title>
+								<action>adminhtml/itorismwishlist_index/</action>
+								<sort_order>5</sort_order>
+							</mwishlist>
+						</children>
+					</itoris_extensions>
+				</children>
+			</system>
+		</menu>
+		<acl>
+			<resources>
+				<admin>
+					<children>
+						<system>
+							<children>
+								<itoris_extensions>
+									<children>
+										<mwishlist translate="title">
+											<title>Multiple wishlists</title>
+											<action>adminhtml/itorismwishlist_index/</action>
+											<sort_order>5</sort_order>
+										</mwishlist>
+									</children>
+								</itoris_extensions>
+							</children>
+						</system>
+					</children>
+				</admin>
+			</resources>
+		</acl>
+    </adminhtml>
+    <admin>
+        <routers>
+            <adminhtml>
+                <args>
+                    <modules>
+                        <itoris_mwishlist before="Mage_Adminhtml">Itoris_MWishlist_Adminhtml</itoris_mwishlist>
+                    </modules>
+                </args>
+            </adminhtml>
+        </routers>
+    </admin>
+    <frontend>
+		<layout>
+			<updates>
+				<itoris_mwishlist>
+					<file>itoris_mwishlist.xml</file>
+				</itoris_mwishlist>
+			</updates>
+		</layout>
+		<translate>
+            <modules>
+                <Itoris_MWishlist>
+                    <files>
+                        <default>Itoris_MWishlist.csv</default>
+                    </files>
+                </Itoris_MWishlist>
+            </modules>
+        </translate>
+
+		<events>
+            <controller_action_predispatch_wishlist_index_index>
+                <observers>
+                    <mwishlist>
+						 <type>singleton</type>
+                        <class>itoris_mwishlist/observer</class>
+                        <method>mwishlistAvailable</method>
+                    </mwishlist>
+                </observers>
+            </controller_action_predispatch_wishlist_index_index>
+
+			<wishlist_add_product>
+                <observers>
+                    <mwishlist>
+						 <type>singleton</type>
+                        <class>itoris_mwishlist/observer</class>
+                        <method>mwishlistAddItem</method>
+                    </mwishlist>
+                </observers>
+            </wishlist_add_product>
+
+			<wishlist_product_add_after>
+				<observers>
+					<mwishlist>
+						<type>singleton</type>
+						<class>itoris_mwishlist/observer</class>
+						<method>unsetItemId</method>
+					</mwishlist>
+				</observers>
+			</wishlist_product_add_after>
+
+			<wishlist_item_save_before>
+				<observers>
+					<mwishlist>
+						<type>singleton</type>
+						<class>itoris_mwishlist/observer</class>
+						<method>setOrigItemQty</method>
+					</mwishlist>
+				</observers>
+			</wishlist_item_save_before>
+
+			<core_collection_abstract_load_before>
+				<observers>
+					<mwishlist>
+						<class>itoris_mwishlist/observer</class>
+						<method>addProductStatusFilter</method>
+					</mwishlist>
+				</observers>
+			</core_collection_abstract_load_before>
+		</events>
+
+
+        <routers>
+            <wishlist>
+                <args>
+					 <modules>
+                         <itoriswishlist before="Mage_Wishlist">Itoris_MWishlist</itoriswishlist>
+                     </modules>
+                </args>
+            </wishlist>
+			<mwishlist>
+				<use>standard</use>
+				<args>
+					<module>Itoris_MWishlist</module>
+					<frontName>mwishlist</frontName>
+				</args>
+			</mwishlist>
+        </routers>
+
+    </frontend>
+
+
+
+</config>

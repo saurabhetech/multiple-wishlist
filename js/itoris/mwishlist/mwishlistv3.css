@@ -1,0 +1,606 @@
+#overlay{
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 100;
+	width: 100%;
+	height: 1292px;
+	opacity: 0.9;
+	background-color: #666666;
+	filter: alpha(opacity=90);
+}
+#dialog{
+	z-index: 102;
+	border:none;
+	position: fixed;
+	/*height: 168px;*/
+	width: 500px;
+	overflow: auto;
+	background-color: #f8f7f5;
+	left: 50%;
+	top: 182.5px;
+	margin: 0 -250px;
+	border-left:1px solid #FFFFFF;
+	border-top:1px solid #FFFFFF;
+	border-right:1px solid #666666;
+	border-bottom:1px solid #666666
+}
+
+#wlname{
+	margin-right: 3px;
+}
+#modalhead{
+	margin-left: 10px;
+	margin-top: 10px;
+}
+#move-block{
+	text-align: left;
+	margin-bottom: 5px;
+}
+#fullhead{
+	border-bottom: 1px solid #BEBCB7;
+}
+
+#head{
+text-align: right;
+}
+#headtext{
+	 font-size: 1.7em !important;
+    font-weight: normal !important;
+    margin: 0;
+    text-align: left;
+    text-transform: none !important;
+    color: #0A263C;
+    line-height: 1.3em;
+}
+
+#content{
+padding: 2px 5px 5px;
+background: none repeat scroll 0 0 #ffffff !important;
+border-bottom: 1px solid #BEBCB7;
+border-left: 1px solid #BEBCB7;
+border-right: 1px solid #BEBCB7;
+}
+
+
+
+#title{
+
+	margin: 0 0 2px !important;
+}
+#wishlist-table tbody tr td textarea {
+
+	display: block;
+    height: 109px;
+    width: 97%;
+}
+
+div.div-mwishbottomright{
+	margin-top: 1px;
+	text-align: right !important;
+	width: 100%;
+}
+.buttons-set button.button {
+    float: none !important;
+    margin-left: 2px !important;
+}
+
+.btn-add span{
+	background: none repeat scroll 0 0 #618499 !important;
+    border: 1px solid #406a83 !important;
+    color: #FFFFFF !important;
+
+}
+
+.btn-add span span {
+    border: 0 none !important;
+    padding: 0 !important;
+}
+
+.btn-share span{
+	background: none repeat scroll 0 0 #618499 !important;
+    border: 1px solid #406a83 !important;
+    color: #FFFFFF !important;
+
+}
+
+.btn-share span span {
+    border: 0 none !important;
+    padding: 0 !important;
+}
+
+
+button.btn-copy{
+
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    margin-left: 5px;
+	margin-top:2px;
+    overflow: visible;
+    padding: 0;
+    width: 90%;
+}
+
+.btn-copy span {
+	cursor: pointer;
+	background: none repeat scroll 0 0 #618499;
+    border: 1px solid #406a83;
+    color: #FFFFFF;
+    display: block;
+    font: bold 12px/19px Arial,Helvetica,sans-serif;
+    height: 19px;
+    padding: 0 8px;
+    text-align: center;
+    white-space: nowrap;
+
+}
+
+
+.btn-copy span span {
+    border: 0 none;
+    padding: 0;
+}
+
+button.btn-copybutton{
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    margin-left: 4px !important;
+	margin-top:0;
+    overflow: visible;
+    padding: 0;
+    width: 22%;
+}
+
+.btn-copybutton span {
+	cursor: pointer;
+	background: none repeat scroll 0 0 #618499;
+    border: 1px solid #406a83;
+    color: #FFFFFF;
+    display: block;
+    font: bold 12px/19px Arial,Helvetica,sans-serif;
+    height: 19px;
+    padding: 0 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+
+.btn-copybutton span span {
+    border: 0 none;
+    padding: 0;
+}
+
+button.btn-movebutton{
+
+   background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    margin-left: 5px !important;
+	margin-top:0px;
+    overflow: visible;
+    padding: 0;
+    width: 72px;
+}
+
+.btn-movebutton span {
+cursor: pointer;
+	 background: none repeat scroll 0 0 #F18200;
+    border: 1px solid #DE5400;
+    color: #FFFFFF;
+    display: block;
+    font: bold 12px/19px Arial,Helvetica,sans-serif;
+    height: 19px;
+    padding: 0 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+
+.btn-movebutton span span {
+    border: 0 none;
+    padding: 0;
+}
+
+
+
+
+
+button.btn-copy::-moz-focus-inner {
+    border: 0 none;
+    padding: 0;
+}
+
+
+button.btn-move{
+   background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    margin-left: 0 ;
+	margin-top:2px;
+    overflow: visible;
+    padding: 0;
+    width: 67px;
+}
+
+.btn-move span {
+	cursor: pointer;
+	 background: none repeat scroll 0 0 #F18200;
+    border: 1px solid #DE5400;
+    color: #FFFFFF;
+    display: block;
+    font: bold 12px/19px Arial,Helvetica,sans-serif;
+    height: 19px;
+    padding: 0 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+
+.btn-move span span {
+    border: 0 none;
+    padding: 0;
+}
+
+
+button.btn-copy::-moz-focus-inner {
+    border: 0 none;
+    padding: 0;
+}
+
+.btn-remove2 {
+	font-size: 100% !important;
+	border: 0;
+}
+
+
+table.table-del{
+	border:0 !important;
+	border-spacing: 0;
+    empty-cells: show;
+    font-size: 100%;
+	width:50%;
+	padding:0;
+}
+
+.table-del tbody{
+	background: none repeat scroll 0 0;
+	margin: 0 !important;
+    padding: 0 !important;
+	border:0 !important;
+}
+
+tr.tr-del{
+	background: none repeat scroll 0 0 !important;
+	margin: 0 !important;
+    padding: 0 !important;
+	border:0 !important;
+}
+
+td.td-del{
+	background: none repeat scroll 0 0;
+	margin: 0 !important;
+    padding: 0 !important;
+	border:0 !important;
+	width:50%
+}
+
+div.div-mwishbottom{
+    margin-left: 0 !important;
+	text-align: left !important;
+	width: 100%;
+	
+}
+
+
+
+
+/*tabs styles*/
+
+
+
+.iwishtabs .titles {
+    position: relative;
+    z-index: 10;
+}
+.iwishtabs .titles .title {
+    cursor: pointer;
+    height: 26px;
+    margin-left: 1px;
+    margin-right: 6px;
+
+}
+.iwishtabs .titles .title.first {
+    margin-left: 0;
+}
+.iwishtabs .titles .title.last {
+    margin-right: 18px;
+}
+.iwishtabs .titles.with-scroll .title.first {
+    margin-left: 1px;
+}
+.iwishtabs .titles .title span {
+    background-repeat: repeat-x;
+    display: inline-block;
+    height: 20px;
+    line-height: 26px;
+    position: relative;
+    z-index: 50;
+	vertical-align: top;
+}
+.iwishtabs .titles .title.current span {
+    z-index: 100;
+	height: 26px;
+}
+.iwishtabs .titles .title .left, .iwishtabs .titles .title .right {
+    float: none !important;
+    width: 1px;
+}
+.iwishtabs .titles .title .right {
+    width: 1px;
+}
+.iwishtabs .titles .titles-holder {
+	background:url(images/horiz_tabs_ul_bg.gif) repeat-x 0 22px;
+	padding:5px 0 5px 5px;
+	height: 17px;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+}
+.iwishtabs .titles .title .corner {
+    bottom: 0;
+    display: block;
+    height: 5px;
+    position: absolute;
+    width: 5px;
+}
+.opera9 .iwishtabs .titles .title .corner {
+    display: inline-block;
+    position: relative;
+}
+.iwishtabs .titles .title .center {
+	/*display:block;*/
+	background:#F1F1F1;
+	border:1px solid #ccc;
+	/*padding:2px 10px;*/
+	color:#333 !important;
+	/*text-decoration:none !important;*/
+	font-weight:bold;
+	margin:0 4px;
+    padding: 0 10px;
+}
+
+.iwishtabs .titles .title.current .center{
+background:#FFFFFF !important;
+border:1px solid #333;
+/*padding:2px 10px;*/
+color:#333 !important;
+font-weight:bold;
+margin:0 4px;
+padding: 0 10px;
+}
+.iwishtabs .titles .title .corner.l {
+    display: none;
+}
+.iwishtabs .titles .title .corner.r {
+    height: 26px;
+    width: 19px;
+}
+.iwishtabs .titles .scroll {
+	padding-top: 7px;
+    cursor: pointer;
+    display: none;
+    position: absolute;
+}
+.iwishtabs .titles .scroll._right {
+    right: 0;
+}
+.iwishtabs .titles .scroll._left {
+    left: 0;
+}
+
+.iwishtabs .titles .scroll._left div{
+    background: url(images/arrow-to-left_normal.png);
+}
+
+.iwishtabs .titles .scroll._left:hover div{
+    background: url(images/arrow-to-left_active.png);
+}
+
+.iwishtabs .titles .scroll._right div{
+    background: url(images/arrow-to-right_normal.png);
+}
+
+.iwishtabs .titles .scroll._right:hover div{
+    background: url(images/arrow-to-right_active.png);
+}
+
+.iwishtabs .titles.with-scroll .scroll {
+    display: block;
+    height: 25px;
+    width: 17px;
+}
+.iwishtabs .titles.with-scroll .titles-holder {
+    margin: 0 17px;
+}
+.iwishtabs .contents {
+    border: 1px solid;
+    position: relative;
+    top: -1px;
+    z-index: 0;
+}
+.iwishtabs .contents2 {
+    margin: 10px;
+}
+.iwishtabs .contents .content {
+    display: none;
+    padding: 0 !important;
+}
+.iwishtabs .contents .content.current {
+    display: inline;
+}
+.product-view .box-up-sell .products-grid td {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+}
+.product-view .box-up-sell {
+    margin: 0;
+}
+.tab_title {
+    display: none;
+}
+
+
+
+.dialog_content{
+	background-color: #f8f7f5 !important;
+    color: #112233 !important;
+	font: bold 12px/19px Arial,Helvetica,sans-serif; !important;
+    
+
+}
+
+#radiostack{
+	margin-left: 20px !important;
+	font: bold 12px/19px Arial,Helvetica,sans-serif; !important;
+}
+
+.top.table_window {
+	display: none !important;
+}
+
+.top.table_window {
+	display: none !important;
+}
+
+.dialog{
+	text-align: left;
+	height:auto !important;
+
+}
+
+.dialog h4{
+margin-top: 10px;
+	margin-left: 10px;
+}
+
+button.selectbutton{
+
+    background: none repeat scroll 0 0 transparent;
+    border: 0 none;
+    cursor: pointer;
+    margin-right: 10px;
+	margin-top:50px;
+    overflow: visible;
+    padding: 0;
+    width: 110px;
+
+}
+
+.selectbutton span {
+	cursor: pointer;
+	background: none repeat scroll 0 0 #618499;
+    border: 1px solid #406a83;
+    color: #FFFFFF;
+    display: block;
+    font: bold 12px/19px Arial,Helvetica,sans-serif;
+    height: 19px;
+    padding: 0 8px;
+    text-align: center;
+    white-space: nowrap;
+}
+
+
+.selectbutton span span {
+    border: 0 none;
+    padding: 0;
+}
+
+#select {
+	width: 100%;
+	text-align: right;
+	border-top:1px solid #AAAAAA;
+	margin-top: 50px;
+	padding: 5px 0;
+}
+
+#loading-process {
+    background: none repeat scroll 0 0 #FFF4E9;
+    border: 2px solid #F1AF73;
+    color: #D85909;
+    font-size: 1.1em;
+    font-weight: bold;
+    left: 50%;
+    margin-left: -60px;
+    padding: 15px 60px;
+    position: absolute;
+    text-align: center;
+    top: 45%;
+    z-index: 501;
+}
+#loading-mask {
+    color: #D85909;
+    font-size: 1.1em;
+    font-weight: bold;
+    opacity: 0.8;
+    position: absolute;
+    text-align: center;
+    z-index: 500;
+}
+#loading-mask .loader {
+    background: none repeat scroll 0 0 #FFF4E9;
+    border: 2px solid #F1AF73;
+    color: #D85909;
+    font-weight: bold;
+    left: 50%;
+    margin-left: -60px;
+    padding: 15px 60px;
+    position: fixed;
+    text-align: center;
+    top: 45%;
+    width: 120px;
+    z-index: 1000;
+}
+
+.central_head{
+	font: 14px/19px Arial,Helvetica,sans-serif;
+	color: #909090;
+	margin-left:10px;
+	margin-top: 2px;
+	padding-bottom: 3px;
+}
+
+#delbutton{
+	float: right;
+	text-align: right;
+	padding-right: 5px;
+
+}
+
+button.delete{
+    background-color: #FCAF81;
+    background-image: url("images/cancel_btn_bg.gif");
+    border-color: #D24403 #A92000 #A92000 #D24403;
+    color: #FFFFFF;
+	padding-left: 6px;border-style: solid;
+    border-width: 1px;
+    cursor: pointer;
+    font: bold 12px arial,helvetica,sans-serif;
+    text-align: center !important;
+    white-space: nowrap;
+	padding-right: 6px;
+	width: 120px;
+}
+
+button.delete span {
+    background-image: url("images/cancel_btn_icon.gif");
+	padding-left: 20px;
+	background-position: 0 50%;
+    background-repeat: no-repeat;
+    line-height: 1.35em;
+}
+
+#select button.selectbutton {
+	margin-top:0;
+}

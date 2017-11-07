@@ -1,0 +1,132 @@
+#itoris-wishlist-popup-box {
+	position: fixed;
+	top:0;
+	left:0;
+	width: 100%;
+	height: 100%;
+	z-index:15000;
+}
+#itoris-wishlist-popup-mask {
+	position: fixed;
+	top: 0;
+	left: 0;
+	z-index: 15000;
+	width: 100%;
+	height: 100%;
+	opacity: 0.9;
+	background-color: #666666;
+	filter: alpha(opacity=90);
+}
+#itoris-wishlist-popup {
+	z-index: 15001;
+	border:none;
+	position: fixed;
+	width: 500px;
+	overflow: auto;
+	background-color: #FFF;
+	top: 182.5px;
+	left:50%;
+	margin: 0 0 0 -250px;
+	border:5px solid #DDD;
+    border-radius: 10px;
+}
+#itoris-wishlist-popup-loading {
+	position: absolute;
+	z-index: 15002;
+	width: 100%;
+	height: 100%;
+	opacity: 0.9;
+	filter: alpha(opacity=90);
+	background: url(images/loader.gif) center center #000000 no-repeat;
+	top:-1px;
+	left:-1px;
+}
+
+#itoris-wishlist-radiostack {
+	margin: 15px 20px;
+	font-size:14px;
+	text-align: left;
+}
+#itoris-wishlist-radiostack  > div {
+    margin: 2px 0;
+}
+#itoris-wishlist-radiostack label {
+    font-weight:normal;
+    font-size:14px;
+}
+#itoris-wishlist-popup-buttons {
+	width: 100%;
+	text-align: right;
+	border-top:1px solid #DDD;
+    background:#f5f5f5;
+	padding: 10px 0;
+}
+#itoris-wishlist-popup-buttons button, #itoris-wishlist-popup button.itoris-wishlist-button-cancel {
+	cursor: pointer;
+	margin: 0 10px 0 0;
+	overflow: visible;
+    border-radius:3px;
+    font: bold 12px/19px Arial, Helvetica, sans-serif;
+    line-height:28px;
+    white-space: nowrap;
+    text-align: center;
+    font-size:14px;
+    font-weight: normal;
+}
+
+#itoris-wishlist-popup-buttons button span span {
+    display:inline-block;
+    padding: 0 30px;
+}
+
+button.btn-cancel {
+	color: #333333;
+    background: #eee;
+    border: 1px solid #ccc;
+    padding: 6px 15px;
+}
+button.btn-cancel:hover {
+    background: #e9e9e9;
+}
+
+button.itoris-wishlist-button-select {
+    color: #fff;
+    background: #1979c3;
+    border:none;
+}
+
+button.itoris-wishlist-button-select:hover {
+    background: #1569aa;
+}
+
+button.itoris-wishlist-button-cancel {
+    color: #333333;
+    background: #eee;
+    border:1px solid #ccc;
+}
+
+button.itoris-wishlist-button-cancel:hover {
+    background: #e9e9e9;
+}
+
+button.itoris-wishlist-button-cancel span span {
+    border-top:1px solid #fff;
+}
+
+#itoris-wishlist-popup-buttons button span {
+	padding: 0;
+    background:none;
+    border-radius:3px;
+}
+
+#itoris-wishlist-popup h4 {
+    text-transform:none;
+    font-weight: normal;
+    font-size: 15px;
+    border-bottom: 1px solid #ccc;
+    display: block;
+    margin: 0px 20px !important;
+    line-height: 38px;
+    text-align: center;
+
+}

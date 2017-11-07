@@ -1,0 +1,150 @@
+<?php
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2012 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+?>
+<?php
+$namesmodel = Mage::getModel('itoris_mwishlist/mwishlistnames');
+$namescollection = $namesmodel->getnamecollection(null, true);
+?>
+<div id="overlay"></div>
+<div id="dialog" class="window">
+	<h4 style="margin-left: 20px;margin-top: 10px"><?php echo $this->__('Please select a wishlist you wish to add selected product(s) to:')?></h4>
+
+	<div id="radiostack" onkeypress="useSelectedWishlist(event)">
+		<?php
+		foreach ($namescollection as $row):
+			?>
+			<div class="radio">
+				<input type="radio" class="radiobutton" name="radio" onclick="$('newinput').value=''"
+					   value="<?php echo $row['multiwishlist_id']?>" <?php if ($row['multiwishlist_is_main']) echo 'checked="checked"' ?>
+					   alt="<?php echo $this->__($row['multiwishlist_name']) ?>"> <?php echo $this->__($row['multiwishlist_name']) ?>
+			</div>
+			<?php endforeach ?>
+		<div class="radio">
+			<input type="radio" class="radiobutton" name="radio"
+				   value="new"> <?php echo $this->__('or create a new wishlist:') ?>
+			<input type="text" onclick="checkRadio()" class="input" id="newinput" width="50%" name="newinput"/>
+		</div>
+	</div>
+	<div id="select">
+		<button type="button" id="btn-sel" title="<?php echo $this->__('Select') ?>" class="selectbutton"
+				onclick="selectWishlist()"><span><span><?php echo $this->__('Select') ?></span></span></button>
+		<button type="button" title="<?php echo $this->__('Cancel') ?>" class="selectbutton"
+				onclick="mwishlistCancelAdding()"><span><span><?php echo $this->__('Cancel') ?></span></span></button>
+	</div>
+</div>
+
+
+
+<script type="text/javascript">
+
+	var sel = $$('.radio');
+	$('dialog').height = (24 * sel.length) + 120;
+
+	function useSelectedWishlist(e) {
+		if (e.keyCode == 13) {
+			selectWishlist();
+		}
+	}
+	function selectWishlist() {
+		var checkedRadio;
+		var flag = true;
+		$$('.radiobutton').each(function(elem) {
+			if (elem.checked) {
+				checkedRadio = elem.value;
+			}
+			if (elem.alt.toLowerCase() == $('newinput').value.toLowerCase()) {
+				flag = false;
+			}
+		});
+		if ((flag == true) || (checkedRadio != 'new')) {
+			if (checkedRadio == 'new') {
+				if ($('newinput').value == '') {
+					alert("Enter the name of new wishlist");
+				} else {
+					$('dialog').hide();
+					$('overlay').hide();
+					new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax/')?>', { method: 'post',
+						parameters: {
+							newWishlistName: $('newinput').value
+						},
+						onSuccess: function(transport) {
+							$('fullcontent').update(transport.responseText);
+							initializeTabsSlider();
+
+						}
+					});
+
+				}
+			} else {
+				$('dialog').hide();
+				$('overlay').hide();
+				new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/ajax/')?>', { method: 'post',
+					parameters: {list: checkedRadio,
+						tabId: checkedRadio
+					},
+					onSuccess: function(transport) {
+						$('fullcontent').update(transport.responseText);
+						initializeTabsSlider();
+					}
+				});
+			}
+		} else {
+			if (checkedRadio == 'new') {
+				if ($('newinput').value == '') {
+					alert("Enter the name of new wishlist");
+				} else {
+					alert('Wishlist with such a name already exists. Please choose a different name.');
+				}
+			}
+		}
+	}
+
+	function mwishlistCancelAdding() {
+		new Ajax.Request('<?php echo Mage::getUrl('wishlist/index/cancelAdding/')?>', {
+			method: 'post',
+			onSuccess: function(transport) {
+				var obj = transport.responseText.evalJSON();
+				$$('.messages .success-msg').each(function(elm) {elm.hide();});
+				if (obj.error) {
+					alert(obj.error);
+				} else {
+					$('dialog').hide();
+					$('overlay').hide();
+					//$('fullcontent').update(transport.responseText);
+					initializeTabsSlider();
+				}
+			}
+		});
+	}
+
+	function checkRadio() {
+		$$('.radiobutton').each(function(elem) {
+			if (elem.value == 'new') {
+
+				elem.checked = true;
+			}
+		});
+	}
+</script>

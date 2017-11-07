@@ -1,0 +1,44 @@
+<?php 
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2012 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+?>
+<?php
+	/** @var $this Itoris_PendingRegistration_Block_Admin_Register */
+?>
+
+<b style="color:red"><?php echo $this->__('Your copy of the component is not registered! All functions are disabled. Please register. Enter your S/N to register:'); ?>
+ <input type="text" id="serial_num" style="width:200px" />&nbsp;<button class="scalable" onclick="if (document.getElementById('serial_num').value=='') return; register(document.getElementById('serial_num').value); " ><?php echo $this->__('Register') ?></button> </b>
+
+<form name="rcotRegister" id="rcotRegister" action="<?php echo Mage::getUrl('*/*/*') ?>" method="post">
+	<input id="sn" type="hidden" name="sn"  value="" />
+	<input id="fk" type="hidden" name="form_key" value="" />
+	<input type="hidden" name="registration" value="true" />
+</form>
+<script>
+	function register(sn){
+		document.getElementById('sn').value = sn;
+		document.getElementById('fk').value = FORM_KEY;
+		document.getElementById( 'rcotRegister' ).submit();
+	}
+</script>

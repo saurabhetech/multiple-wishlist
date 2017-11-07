@@ -1,0 +1,194 @@
+<?php
+/**
+ * ITORIS
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the ITORIS's Magento Extensions License Agreement
+ * which is available through the world-wide-web at this URL:
+ * http://www.itoris.com/magento-extensions-license.html
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to sales@itoris.com so we can send you a copy immediately.
+ *
+ * DISCLAIMER
+ *
+ * Do not edit or add to this file if you wish to upgrade the extensions to newer
+ * versions in the future. If you wish to customize the extension for your
+ * needs please refer to the license agreement or contact sales@itoris.com for more information.
+ *
+ * @category   ITORIS
+ * @package    ITORIS_MWISHLIST
+ * @copyright  Copyright (c) 2014 ITORIS INC. (http://www.itoris.com)
+ * @license    http://www.itoris.com/magento-extensions-license.html  Commercial License
+ */
+?>
+<?php
+/** @var $this Itoris_MWishlist_Block_Content_Mobile */
+$editableWishlists = $this->getEditableWishlists();
+$id = $this->getRequest()->getParam('tabId', $this->getTabId());
+$version = version_compare(Mage::getVersion(), '1.10.0.0', '>=') ? '1.9.0.0' : Mage::getVersion();
+$isEnabledPriceVisibility = $this->getDataHelper()->isEnabledProductVisibility();
+$canAddAllToShoppingCart = true;
+$currentWishlist = $this->getMwishlistModel()->loadById($id);
+$wishlistId = $currentWishlist['multiwishlist_id'];
+?>
+
+<?php 
+if (Mage::getSingleton('customer/session')->isLoggedIn()) {
+$data = array();
+$data['wishlistId'] =$wishlistId;
+$data['customerId'] =Mage::getSingleton('customer/session')->getCustomer()->getId();
+
+$wishlistModel = Mage::getModel('itoris_mwishlist/mwishlistnames');
+$display_price_check = $wishlistModel->getPricingDisplay($data);
+} else {
+$display_price_check = 0;
+}
+?>
+<div id="mwishlist-mobile-view" style="display: none;">
+<div class="display_price_checkbox_container">
+	<input type="checkbox" name="display_price" id="display_price_<?php echo $wishlistId;?>" onclick="setPricingDisplay(<?php echo $wishlistId ?>, <?php echo $id;?>)" <?php if ($display_price_check) echo "checked='checked'"; ?> class="display_price" />
+	<span class="pricing_label span"><?php echo $this->__('Display No Prices') ?></span>
+</div>
+<?php if ($this->getHasWishlistItems()): ?>
+	<form id="mwishlist-view-form-mobile" action="<?php echo $this->getUrl('*/*/update') ?>" method="post">
+	<input type="hidden" name="mwishlist_id" value="<?php echo $wishlistId ?>" />
+	<fieldset>
+	<input type="hidden" name="tabId" value="<?php echo $id?>">
+	<?php echo $this->getBlockHtml('formkey')?>
+	<ul class="wishlist-items">
+		<?php foreach ($this->getWishlistItems() as $item): ?>
+			<?php
+			$product = $item->getProduct();
+			$priceVisibilityConfig = $isEnabledPriceVisibility ? $this->getProductPriceVisibilityConfig($product) : null;
+			$wishlistItemId = $item->getId();
+			?>
+			<li class="wishlist-item">
+				<a class="product-image" href="<?php echo $this->getProductUrl($product) ?>" title="<?php echo $this->htmlEscape($product->getName()) ?>">
+					<img src="<?php echo $this->helper('catalog/image')->init($product, 'small_image')->resize(80); ?>" alt="<?php echo $this->htmlEscape($product->getName()) ?>"/>
+				</a>
+				<div class="wishlist-item-details">
+						<h2 class="product-name">
+							<a href="<?php echo $this->getProductUrl($product) ?>"><?php echo $this->htmlEscape($product->getName()) ?></a>
+						</h2>
+					<?php if (!$priceVisibilityConfig || $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_DEFAULT
+						|| $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_SHOW_PRICE_DISALLOW_ADD_TO_CART): ?>
+						<?php
+						echo $this->getCleanProductPriceHtml();
+						$finalPrice = $product->getFinalPrice(1);
+						$pointsPrice = $this->getPointsPrice($product, $finalPrice);
+						?>
+						<p class="price-box">
+					<span class="regular-price" id="product-price-<?php echo $product->getId()?><?php echo $product->getIdSuffix() ?>">
+						<?php if ($pointsPrice && $pointsPrice['override']): ?>
+							<span class="price"><?php echo $this->getProductRewardsHelper()->__('%d RP', $pointsPrice['points']) ?></span>
+						<?php else: ?>
+							<span class="price"><?php echo Mage::helper('core')->currency($finalPrice, true, false); ?> <?php if ($pointsPrice && $pointsPrice['points']): echo $this->getProductRewardsHelper()->__('or %d RP', $pointsPrice['points']); endif; ?></span>
+						<?php endif; ?>
+					</span>
+						</p>
+					<?php elseif ($priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_OUT_OF_STOCK): ?>
+						<p class="availability out-of-stock"><span><?php echo $this->__('Out of Stock') ?></span></p>
+					<?php elseif ($priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_CUSTOM_MESSAGE): ?>
+						<p><?php echo $priceVisibilityConfig['message'] ?></p>
+					<?php endif; ?>
+
+					<?php if ($currentWishlist['multiwishlist_editable']): ?>
+						<div style="float: right;">
+							<button class="button btn-copy" onclick="setLocation('<?php echo $this->getUrl("wishlist/index/configure/id/$wishlistItemId") ?>'); return false;">
+								<span><span><?php echo $this->__('Edit') ?></span></span>
+							</button>
+							<button type="button" class="button delete" onclick="removeItem(<?php echo $item->getId()?>)">
+								<span><span><?php echo $this->__('Remove') ?></span></span>
+							</button>
+						</div>
+					<?php endif; ?>
+<?php if (!$display_price_check):?>
+							<span><?php echo $this->__('Price') ?></span>
+						<?php endif;?>
+					<?php if (!$priceVisibilityConfig || $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_DEFAULT): ?>
+						<?php if ((int)$version[2] >= 5): ?>
+							<input type="text" class="input-text qty" name="mobile_mwishlistqty[<?php echo $item->getId() ?>]" value="<?php echo floatval($item->getQty());?>"/>
+						<?php endif ?>
+						<?php if ($product->isSaleable()): ?>
+							<button type="button" title="<?php echo $this->__('Add to Cart') ?>" onclick="mwishlistAddToCartMobile('<?php echo $this->getAddToCartItemUrl($item) ?>', <?php echo $item->getId() ?>);" class="button btn-cart">
+								<span><span><?php echo $this->__('Add to Cart') ?></span></span>
+							</button>
+						<?php endif ?>
+					<?php elseif ($priceVisibilityConfig && $priceVisibilityConfig['mode'] == Itoris_ProductPriceVisibility_Helper_Product::MODE_SHOW_PRICE_DISALLOW_ADD_TO_CART): ?>
+						<p><?php echo $priceVisibilityConfig['message'] ?></p>
+					<?php else:
+						$canAddAllToShoppingCart = false;
+					endif; ?>
+				</div>
+				<div style="clear: both;margin-top: 5px;">
+					<?php if ($currentWishlist['multiwishlist_editable']): ?>
+						<?php if (count($editableWishlists) > 1): ?>
+							<?php if ((int)$version[2] >= 5): ?>
+								<strong><?php echo $this->__('&nbsp;Copy/Move to Wishlist:') ?></strong>
+							<?php endif ?>
+							<?php if ((int)$version[2] == 4): ?>
+								<div><strong><?php echo $this->__('&nbsp;Move to Wishlist:') ?></strong></div>
+							<?php endif ?>
+							<select id="mobile_mwishlist_item_select<?php echo $item->getId() ?>" style="width:150px;"/>
+							<?php foreach ($editableWishlists as $row): ?>
+								<?php if ($wishlistId == $row['multiwishlist_id']) continue; ?>
+								<option value="<?php echo $row['multiwishlist_id']?>"><?php echo $this->__($row['multiwishlist_name'])?></option>
+							<?php endforeach ?>
+							</select>
+							<button type="button" title="<?php echo $this->__('Move') ?>"
+										onclick="moveBetweenLists(<?php echo $item->getId()?>,$('mobile_mwishlist_item_select<?php echo $item->getId() ?>').value)"
+										class="button btn-move"><span><span><?php echo $this->__('Move') ?></span></span>
+							</button>
+							<?php if ((int)$version[2] >= 5): ?>
+								<button type="button" title="<?php echo $this->__('Copy') ?>"
+									onclick="copyToWlist(<?php echo $item->getId()?>,$('mobile_mwishlist_item_select<?php echo $item->getId() ?>').value)"
+										class="button btn-copy"><span><span><?php echo $this->__('Copy') ?></span></span>
+								</button>
+							<?php endif ?>
+						<?php endif; ?>
+					<?php endif; ?>
+				<textarea name="description[<?php echo $item->getWishlistItemId() ?>]" rows="3"
+						  onfocus="focusComment(this)" onblur="focusComment(this)"
+						  title="<?php echo $this->__('Comment') ?>"><?php echo $item->getDescription()
+						? $item->getDescription() : $this->__('Please, enter your comments...') ?></textarea>
+				</div>
+				</li>
+		<?php endforeach ?>
+	</ul>
+	<button type="button" onclick="setLocation('<?php echo $this->getUrl('wishlist/index/share', array('id' => $wishlistId)) ?>')" title="<?php echo $this->__('Share Wishlist') ?>" class="button btn-copy">
+		<span><span><?php echo $this->__('Share Wishlist') ?></span></span>
+	</button>
+	<?php if ($canAddAllToShoppingCart): ?>
+		<button type="button" title="<?php echo $this->__('Add All to Cart') ?>" onclick="openme()" class="button btn-copy">
+			<span><span><?php echo $this->__('Add All to Cart') ?></span></span>
+		</button>
+	<?php endif; ?>
+	<button type="submit" title="<?php echo $this->__('Update Wishlist') ?>" class="button btn-update">
+		<span><span><?php echo $this->__('Update Wishlist') ?></span></span>
+	</button>	
+	<button type="button" onclick="setLocation('<?php echo $this->getUrl('wishlist/index/resetquantity', array('id' => $wishlistId)) ?>')"
+			title="<?php echo $this->__('Reset All Quantity') ?>" class="button btn-update">
+		<span><span><?php echo $this->__('Reset All Quantity') ?></span></span></button>
+	</fieldset>
+	</form>
+<?php else: ?>
+	<p><?php echo $this->__('You have no items in your wishlist.') ?></p>
+<?php endif ?>
+</div>
+<script type="text/javascript">
+
+function openme() {
+	jQuery('#itoris-wishlist-addtocart-popup').css('display', 'block');
+}
+
+function mwishlistAddToCartMobile(url, itemId) {
+	var qtyElm = document.getElementsByName('mobile_mwishlistqty[' + itemId + ']')[0];
+	if (qtyElm) {
+		url = url.sub('{{qty}}', parseNumber(qtyElm.value));
+	}
+	setLocation(url);
+}
+
+</script>
